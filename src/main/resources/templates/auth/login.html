@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+<div class="nav-bar">
+    <a sec:authorize="isAuthenticated()" th:href="@{/users/profile}" class="nav-btn">Профиль</a>
+    <a sec:authorize="hasRole('ADMIN')" th:href="@{/users}" class="nav-btn">Пользователи</a>
+    <a th:href="@{/products}" class="nav-btn">Товары</a>
+    <a th:href="@{/categories}" class="nav-btn">Категории</a>
+    <a sec:authorize="isAuthenticated()" th:href="@{/orders}" class="nav-btn">Заказы</a>
+    <a th:href="@{/author}" class="nav-btn">Об авторе</a>
+</div>
+
+<div class="container" style="max-width: 400px; margin-top: 100px;">
+    <h1>Вход в систему</h1>
+
+    <div th:if="${param.error}" style="color: red; margin-bottom: 15px;">
+        Неправильный логин или пароль
+    </div>
+
+    <div th:if="${param.registered}" style="color: green; margin-bottom: 15px;">
+        Регистрация успешна! Теперь вы можете войти.
+    </div>
+
+    <form th:action="@{/login}" method="post" class="login-form">
+        <input type="text" name="username" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <button type="submit">Войти</button>
+    </form>
+
+    <p style="margin-top: 20px; text-align: center;">
+        Нет аккаунта? <a th:href="@{/register}">Зарегистрироваться</a>
+    </p>
+</div>
+</body>
+</html>

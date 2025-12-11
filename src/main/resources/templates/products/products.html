@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Товары</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/app.js}"></script>
+</head>
+
+<body>
+<div class="nav-bar">
+    <a sec:authorize="isAuthenticated()" th:href="@{/users/profile}" class="nav-btn">Профиль</a>
+    <a sec:authorize="hasRole('ADMIN')" th:href="@{/users}" class="nav-btn">Пользователи</a>
+    <a th:href="@{/products}" class="nav-btn">Товары</a>
+    <a th:href="@{/categories}" class="nav-btn">Категории</a>
+    <a sec:authorize="isAuthenticated()" th:href="@{/orders}" class="nav-btn">Заказы</a>
+    <a th:href="@{/author}" class="nav-btn">Об авторе</a>
+</div>
+
+<div class="container">
+    <h1>Товары</h1>
+    <div class="logout">
+        <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
+            <button type="submit">Выйти</button>
+        </form>
+
+        <a sec:authorize="!isAuthenticated()" th:href="@{/login}" style="text-decoration: none;">
+            <button type="button">Войти</button>
+        </a>
+    </div>
+
+    <div class="actions-bar" sec:authorize="hasAnyRole('MANAGER', 'ADMIN')">
+        <a th:href="@{/products/create}" style="text-decoration: none;">
+            <button type="button" class="create-btn">+ Добавить новый товар</button>
+        </a>
+    </div>
+
+    <div class="filter-section">
+        <h2>Поиск и фильтры</h2>
+        <form th:action="@{/products}" method="get" class="filter-form">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="name">Название</label>
+                    <input type="text" id="name" name="name" placeholder="Название товара" th:value="${param.name}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="brand">Бренд</label>
+                    <input type="text" id="brand" name="brand" placeholder="Бренд" th:value="${param.brand}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="category">Категория</label>
+                    <select id="category" name="category">
+                        <option value="">Все категории</option>
+                        <option th:each="cat : ${categories}"
+                                th:value="${cat.name}"
+                                th:text="${cat.name}"
+                                th:selected="${param.category == cat.name}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="minPrice">Мин. цена</label>
+                    <input type="number" id="minPrice" name="minPrice" placeholder="0" th:value="${param.minPrice}" step="0.01">
+                </div>
+
+                <div class="filter-group">
+                    <label for="maxPrice">Макс. цена</label>
+                    <input type="number" id="maxPrice" name="maxPrice" placeholder="999999" th:value="${param.maxPrice}" step="0.01">
+                </div>
+
+                <div class="filter-group">
+                    <label for="minQuantity">Мин. количество</label>
+                    <input type="number" id="minQuantity" name="minQuantity" placeholder="0" th:value="${param.minQuantity}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="maxQuantity">Макс. количество</label>
+                    <input type="number" id="maxQuantity" name="maxQuantity" placeholder="999999" th:value="${param.maxQuantity}">
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit">Поиск</button>
+                <a th:href="@{/products}" style="text-decoration: none;">
+                    <button type="button" class="reset-btn">Сбросить</button>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="stats-section">
+        <div class="stat-card">
+            <span class="stat-label">Средняя цена товара:</span>
+            <span class="stat-value" id="avg-price">0.00</span> <span class="currency">руб.</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-label">Среднее количество (шт):</span>
+            <span class="stat-value" id="avg-quantity">0</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-label">Всего позиций:</span>
+            <span class="stat-value" id="total-items">0</span>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <h2>Список товаров</h2>
+        <table class="users-table">
+            <thead>
+            <tr>
+                <th class="sortable" data-column="id">ID <span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="name">Название<span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="brand">Брэнд<span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="category">Категория<span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="price">Цена <span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="quantity">Количество <span class="sort-indicator"></span></th>
+                <th sec:authorize="isAuthenticated()">Действия</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="product : ${products}">
+                <td th:text="${product.id}"></td>
+                <td th:text="${product.name}"></td>
+                <td th:text="${product.brand ?: '-'}"></td>
+                <td th:text="${product.categoryName}"></td>
+                <td th:text="${#numbers.formatDecimal(product.price, 1, 2)}"></td>
+                <td th:text="${product.quantity}"></td>
+
+                <td sec:authorize="isAuthenticated()">
+                    <a th:href="@{/orders/create(productId=${product.id})}" style="text-decoration: none;">
+                        <button type="button" class="edit-btn">Заказать</button>
+                    </a>
+
+                    <span sec:authorize="hasAnyRole('MANAGER', 'ADMIN')">
+                        <a th:href="@{/products/{id}/edit(id=${product.id})}" style="text-decoration: none;">
+                            <button type="button" class="edit-btn">Редактировать</button>
+                        </a>
+
+                        <form th:action="@{/products/{id}/delete(id=${product.id})}" method="post" style="display:inline;"
+                              onsubmit="return confirm('Удалить товар?');">
+                            <button type="submit" class="delete-btn">Удалить</button>
+                        </form>
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

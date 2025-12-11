@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Форма категории</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+<div class="nav-bar">
+    <a sec:authorize="isAuthenticated()" th:href="@{/users/profile}" class="nav-btn">Профиль</a>
+    <a sec:authorize="hasRole('ADMIN')" th:href="@{/users}" class="nav-btn">Пользователи</a>
+    <a th:href="@{/products}" class="nav-btn">Товары</a>
+    <a th:href="@{/categories}" class="nav-btn">Категории</a>
+    <a sec:authorize="isAuthenticated()" th:href="@{/orders}" class="nav-btn">Заказы</a>
+    <a th:href="@{/author}" class="nav-btn">Об авторе</a>
+</div>
+
+<div class="container" style="max-width: 600px; margin-top: 50px;">
+    <h1 th:text="${title}">Форма категории</h1>
+
+    <div th:if="${error}" style="color: red; margin-bottom: 15px;" th:text="${error}"></div>
+
+    <form th:action="@{${action}}" method="post" class="user-form">
+        <input type="hidden" th:field="*{categoryDto.id}">
+
+        <div class="form-group">
+            <label>Название:</label>
+            <input type="text" th:field="*{categoryDto.name}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Описание:</label>
+            <textarea th:field="*{categoryDto.description}" rows="4"></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="action-btn save-btn">Сохранить</button>
+            <button type="button" class="action-btn cancel-btn" onclick="location.href='/categories'">Отмена</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

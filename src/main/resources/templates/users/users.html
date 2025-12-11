@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Пользователи</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/app.js}"></script>
+</head>
+
+<body>
+<div class="nav-bar">
+    <a sec:authorize="isAuthenticated()" th:href="@{/users/profile}" class="nav-btn">Профиль</a>
+    <a sec:authorize="hasRole('ADMIN')" th:href="@{/users}" class="nav-btn">Пользователи</a>
+    <a th:href="@{/products}" class="nav-btn">Товары</a>
+    <a th:href="@{/categories}" class="nav-btn">Категории</a>
+    <a sec:authorize="isAuthenticated()" th:href="@{/orders}" class="nav-btn">Заказы</a>
+    <a th:href="@{/author}" class="nav-btn">Об авторе</a>
+</div>
+
+<div class="container">
+    <h1>Пользователи</h1>
+
+    <div class="logout">
+        <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
+            <button type="submit">Выйти</button>
+        </form>
+
+        <a sec:authorize="!isAuthenticated()" th:href="@{/login}" style="text-decoration: none;">
+            <button type="button">Войти</button>
+        </a>
+    </div>
+
+    <div class="actions-bar" sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/users/create}" style="text-decoration: none;">
+            <button type="button" class="create-btn">+ Добавить нового пользователя</button>
+        </a>
+    </div>
+
+    <div class="filter-section">
+        <h2>Поиск и фильтры</h2>
+        <form th:action="@{/users}" method="get" class="filter-form">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="email">Email</label>
+                    <input type="text" id="email" name="email" placeholder="Email" th:value="${param.email}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="firstName">Имя</label>
+                    <input type="text" id="firstName" name="firstName" placeholder="Имя" th:value="${param.firstName}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="lastName">Фамилия</label>
+                    <input type="text" id="lastName" name="lastName" placeholder="Фамилия" th:value="${param.lastName}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="role">Роль</label>
+                    <select id="role" name="role">
+                        <option value="">Все роли</option>
+                        <option th:each="role : ${roles}"
+                                th:value="${role}"
+                                th:text="${role}"
+                                th:selected="${param.role == role.name()}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="createdFrom">Создан с</label>
+                    <input type="date" id="createdFrom" name="createdFrom" th:value="${param.createdFrom}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="createdTo">Создан по</label>
+                    <input type="date" id="createdTo" name="createdTo" th:value="${param.createdTo}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="updatedFrom">Изменен с</label>
+                    <input type="date" id="updatedFrom" name="updatedFrom" th:value="${param.updatedFrom}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="updatedTo">Изменен по</label>
+                    <input type="date" id="updatedTo" name="updatedTo" th:value="${param.updatedTo}">
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit">Поиск</button>
+                <a th:href="@{/users}" style="text-decoration: none;">
+                    <button type="button" class="reset-btn">Сбросить</button>
+                </a>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="table-section">
+        <h2>Список пользователей</h2>
+        <table class="users-table">
+            <thead>
+            <tr>
+                <th class="sortable" data-column="id">ID<span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="email">Email<span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="firstName">Имя<span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="lastName">Фамилия<span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="Role">Роль<span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="createdAt">Дата создания<span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="updatedAt">Дата изменения<span class="sort-indicator"></span></th>
+                <th sec:authorize="hasRole('ADMIN')">Действия</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.firstName}"></td>
+                <td th:text="${user.lastName}"></td>
+                <td th:text="${user.role}"></td>
+                <td th:text="${#temporals.format(user.createdAt, 'dd.MM.yyyy HH:mm')}"></td>
+                <td th:text="${user.updatedAt != null ? #temporals.format(user.updatedAt, 'dd.MM.yyyy HH:mm') : '-'}"></td>
+
+                <td sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/users/{id}/edit(id=${user.id})}" style="text-decoration: none;">
+                        <button type="button" class="edit-btn">Редактировать</button>
+                    </a>
+
+                    <form th:action="@{/users/{id}/delete(id=${user.id})}" method="post" style="display:inline;"
+                          onsubmit="return confirm('Удалить пользователя?');">
+                        <button type="submit" class="delete-btn">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

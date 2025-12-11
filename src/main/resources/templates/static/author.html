@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Об авторе</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+<div class="nav-bar">
+    <a sec:authorize="isAuthenticated()" th:href="@{/users/profile}" class="nav-btn">Профиль</a>
+    <a sec:authorize="hasRole('ADMIN')" th:href="@{/users}" class="nav-btn">Пользователи</a>
+    <a th:href="@{/products}" class="nav-btn">Товары</a>
+    <a th:href="@{/categories}" class="nav-btn">Категории</a>
+    <a sec:authorize="isAuthenticated()" th:href="@{/orders}" class="nav-btn">Заказы</a>
+    <a th:href="@{/author}" class="nav-btn">Об авторе</a>
+</div>
+
+<div class="container" style="max-width: 800px;">
+    <h1>Об авторе</h1>
+
+    <div class="logout">
+        <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
+            <button type="submit">Выйти</button>
+        </form>
+
+        <a sec:authorize="!isAuthenticated()" th:href="@{/login}" style="text-decoration: none;">
+            <button type="button">Войти</button>
+        </a>
+    </div>
+
+    <div class="info-section" style="margin-top: 30px;">
+        <div class="info-row" style="margin-bottom: 20px;">
+            <h3>ФИО:</h3>
+            <p>Кобзарь Михаил Андреевич</p>
+        </div>
+
+        <div class="info-row" style="margin-bottom: 20px;">
+            <h3>Учебное заведение:</h3>
+            <p>Финансовый университет при Правительстве Российской Федерации</p>
+        </div>
+
+        <div class="info-row" style="margin-bottom: 20px;">
+            <h3>Контактные данные:</h3>
+            <ul style="margin-left: 20px;">
+                <li>Email: <a href="mailto:240153@edu.fa.ru">240153@edu.fa.ru</a></li>
+                <li>Telegram: @knamgie</li>
+            </ul>
+        </div>
+
+        <div class="info-row" style="margin-bottom: 20px;">
+            <h3>Использованные технологии:</h3>
+            <p style="line-height: 1.3;">
+                Java 17, Spring Boot 3.4, Thymeleaf, Spring Security, Hibernate/JPA, MySQL, Maven.
+            </p>
+        </div>
+
+        <div class="info-row" style="margin-bottom: 20px;">
+            <h3>Дата начала работы над проектом:</h3>
+            <p>Сентябрь, 2025 г.</p>
+        </div>
+
+        <div class="info-row">
+            <h3>Дата завершения работы над проектом:</h3>
+            <p>Декабрь, 2025 г.</p>
+        </div>
+    </div>
+
+    <div class="form-actions" style="margin-top: 30px; text-align: center;">
+        <a th:href="@{/products}" style="text-decoration: none;">
+            <button type="button" class="cancel-btn">Вернуться к товарам</button>
+        </a>
+    </div>
+</div>
+</body>
+</html>

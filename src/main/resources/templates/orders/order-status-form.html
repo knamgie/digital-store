@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Изменение статуса заказа</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+<div class="nav-bar">
+    <a sec:authorize="isAuthenticated()" th:href="@{/users/profile}" class="nav-btn">Профиль</a>
+    <a sec:authorize="hasRole('ADMIN')" th:href="@{/users}" class="nav-btn">Пользователи</a>
+    <a th:href="@{/products}" class="nav-btn">Товары</a>
+    <a th:href="@{/categories}" class="nav-btn">Категории</a>
+    <a sec:authorize="isAuthenticated()" th:href="@{/orders}" class="nav-btn">Заказы</a>
+    <a th:href="@{/author}" class="nav-btn">Об авторе</a>
+</div>
+
+<div class="container" style="max-width: 600px; margin-top: 50px;">
+    <h1 th:text="${title}">Изменение статуса заказа</h1>
+
+    <div th:if="${error}" style="color: red; margin-bottom: 15px;" th:text="${error}"></div>
+
+    <div class="info-section" style="margin-bottom: 20px; padding: 15px; background: #f9f9f9; border: 1px solid #ddd;">
+        <p><strong>Заказ #</strong><span th:text="${orderDto.id}"></span></p>
+        <p><strong>Пользователь:</strong> <span th:text="${orderDto.userEmail}"></span></p>
+        <p><strong>Товар:</strong> <span th:text="${orderDto.productName}"></span></p>
+        <p><strong>Количество:</strong> <span th:text="${orderDto.quantity}"></span></p>
+        <p><strong>Текущий статус:</strong> <span th:text="${orderDto.status}"></span></p>
+    </div>
+
+    <form th:action="@{${action}}" method="post" class="user-form">
+        <input type="hidden" name="id" th:value="${orderDto.id}">
+
+        <div class="form-group">
+            <label for="status">Новый статус:</label>
+            <select id="status" name="status" required>
+                <option value="">Выберите статус</option>
+                <option th:each="status : ${statuses}"
+                        th:value="${status}"
+                        th:text="${status}"
+                        th:disabled="${orderDto.status == status}"
+                        th:selected="${orderDto.status == status}">
+                </option>
+            </select>
+
+            <small style="color: #666;" th:if="${currentUserRole.name() == 'CLIENT'}">
+                Вы можете только отменить заказ
+            </small>
+
+            <small style="color: #666;" th:if="${currentUserRole.name() != 'CLIENT'}">
+                Текущий статус не может быть выбран повторно
+            </small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="action-btn save-btn">Сохранить статус</button>
+            <button type="button" class="action-btn cancel-btn" onclick="location.href='/orders'">Отмена</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

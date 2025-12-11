@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+<div class="nav-bar">
+    <a sec:authorize="isAuthenticated()" th:href="@{/users/profile}" class="nav-btn">Профиль</a>
+    <a sec:authorize="hasRole('ADMIN')" th:href="@{/users}" class="nav-btn">Пользователи</a>
+    <a th:href="@{/products}" class="nav-btn">Товары</a>
+    <a th:href="@{/categories}" class="nav-btn">Категории</a>
+    <a sec:authorize="isAuthenticated()" th:href="@{/orders}" class="nav-btn">Заказы</a>
+    <a th:href="@{/author}" class="nav-btn">Об авторе</a>
+</div>
+
+<div class="container" style="max-width: 400px; margin-top: 100px;">
+    <h1>Регистрация</h1>
+
+    <div th:if="${error}" style="color: red; margin-bottom: 15px;" th:text="${error}"></div>
+
+    <form th:action="@{/registration}" method="post" class="login-form">
+        <input type="email" name="email" placeholder="Email" required th:value="${userDto.email}">
+        <input type="text" name="firstName" placeholder="Имя (необязательно)" th:value="${userDto.firstName}">
+        <input type="text" name="lastName" placeholder="Фамилия (необязательно)" th:value="${userDto.lastName}">
+        <input type="password" name="password" placeholder="Пароль (минимум 6 символов)" required minlength="6">
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+
+    <p style="margin-top: 20px; text-align: center;">
+        Уже есть аккаунт? <a th:href="@{/login}">Войти</a>
+    </p>
+</div>
+</body>
+</html>

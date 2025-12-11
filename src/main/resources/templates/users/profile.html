@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="nav-bar">
+    <a sec:authorize="isAuthenticated()" th:href="@{/users/profile}" class="nav-btn">Профиль</a>
+    <a sec:authorize="hasRole('ADMIN')" th:href="@{/users}" class="nav-btn">Пользователи</a>
+    <a th:href="@{/products}" class="nav-btn">Товары</a>
+    <a th:href="@{/categories}" class="nav-btn">Категории</a>
+    <a sec:authorize="isAuthenticated()" th:href="@{/orders}" class="nav-btn">Заказы</a>
+    <a th:href="@{/author}" class="nav-btn">Об авторе</a>
+</div>
+
+<div class="container">
+    <h1>Мой профиль</h1>
+    <div class="logout">
+        <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
+            <button type="submit">Выйти</button>
+        </form>
+
+        <a sec:authorize="!isAuthenticated()" th:href="@{/login}" style="text-decoration: none;">
+            <button type="button">Войти</button>
+        </a>
+    </div>
+
+    <div th:if="${error}" style="color: red; margin-bottom: 15px;" th:text="${error}"></div>
+
+    <div th:if="${param.updated}" style="color: green; margin-bottom: 15px;">
+        Профиль успешно обновлен!
+    </div>
+
+    <div class="form-section" style="max-width: 600px;">
+        <form th:action="@{/users/profile/update}" method="post" class="user-form">
+            <input type="hidden" name="id" th:value="${user.id}">
+
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" name="email" th:value="${user.email}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Имя:</label>
+                <input type="text" name="firstName" th:value="${user.firstName}" placeholder="Ваше имя">
+            </div>
+
+            <div class="form-group">
+                <label>Фамилия:</label>
+                <input type="text" name="lastName" th:value="${user.lastName}" placeholder="Ваша фамилия">
+            </div>
+
+            <div class="form-group">
+                <label>Новый пароль:</label>
+                <input type="password" name="password" placeholder="Оставьте пустым, чтобы не менять" minlength="6">
+                <small style="color: #666;">Минимум 6 символов</small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="action-btn save-btn">Сохранить изменения</button>
+                <button type="button" class="action-btn cancel-btn" onclick="location.href='/'">Отмена</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="info-section" style="margin-top: 30px; padding: 20px; background: #f9f9f9; border: 1px solid #ddd;">
+        <h2>Информация о профиле</h2>
+        <p><strong>Роль:</strong> <span th:text="${user.role}"></span></p>
+        <p><strong>Дата создания:</strong> <span th:text="${#temporals.format(user.createdAt, 'dd.MM.yyyy HH:mm')}"></span></p>
+        <p><strong>Дата последнего изменения:</strong> <span th:text="${user.updatedAt != null ? #temporals.format(user.updatedAt, 'dd.MM.yyyy HH:mm') : 'Никогда'}"></span></p>
+    </div>
+</div>
+</body>
+</html>

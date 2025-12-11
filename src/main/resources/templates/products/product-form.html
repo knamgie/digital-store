@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Форма товара</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+<div class="nav-bar">
+    <a sec:authorize="isAuthenticated()" th:href="@{/users/profile}" class="nav-btn">Профиль</a>
+    <a sec:authorize="hasRole('ADMIN')" th:href="@{/users}" class="nav-btn">Пользователи</a>
+    <a th:href="@{/products}" class="nav-btn">Товары</a>
+    <a th:href="@{/categories}" class="nav-btn">Категории</a>
+    <a sec:authorize="isAuthenticated()" th:href="@{/orders}" class="nav-btn">Заказы</a>
+    <a th:href="@{/author}" class="nav-btn">Об авторе</a>
+</div>
+
+<div class="container" style="max-width: 600px; margin-top: 50px;">
+    <h1 th:text="${title}">Форма товара</h1>
+
+    <div th:if="${error}" style="color: red; margin-bottom: 15px;" th:text="${error}"></div>
+
+    <form th:action="@{${action}}" method="post" class="user-form">
+        <input type="hidden" th:field="*{productDto.id}">
+
+        <div class="form-group">
+            <label>Название:</label>
+            <input type="text" th:field="*{productDto.name}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Бренд:</label>
+            <input type="text" th:field="*{productDto.brand}" placeholder="Например: Samsung, Apple">
+        </div>
+
+        <div class="form-group">
+            <label>Категория:</label>
+            <select th:field="*{productDto.categoryId}" required>
+                <option value="">Выберите категорию</option>
+                <option th:each="cat : ${categories}"
+                        th:value="${cat.id}"
+                        th:text="${cat.name}"
+                        th:selected="${productDto.categoryId == cat.id}"></option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Цена:</label>
+            <input type="number" th:field="*{productDto.price}" step="0.01" min="0" required>
+        </div>
+
+        <div class="form-group">
+            <label>Количество:</label>
+            <input type="number" th:field="*{productDto.quantity}" min="0" required>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="action-btn save-btn">Сохранить</button>
+            <button type="button" class="action-btn cancel-btn" onclick="location.href='/products'">Отмена</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>
